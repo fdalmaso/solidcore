@@ -96,7 +96,7 @@ def trusted_run(run, repository):
     return (isinstance(run, dict) and isinstance(run.get("repository"), dict)
             and isinstance(run.get("head_repository"), dict)
             and run.get("path") == WORKFLOW and run.get("head_branch") == "main"
-            and run.get("event") in {"schedule", "workflow_dispatch"}
+            and isinstance(run.get("event"), str) and run["event"] in {"schedule", "workflow_dispatch"}
             and run.get("status") == "completed" and run.get("conclusion") == "success"
             and run.get("repository", {}).get("full_name") == repository
             and run.get("head_repository", {}).get("full_name") == repository)
@@ -112,7 +112,8 @@ def validate_bundle(directory, repository, root=ROOT, run=None):
                 f"invalid provenance {key}")
     require(provenance["corpus_commit"] == report["corpus"]["commit"], "provenance corpus pin disagrees")
     require(provenance.get("ref") == "refs/heads/main"
-            and provenance.get("event") in {"schedule", "workflow_dispatch"}, "report is not from main")
+            and isinstance(provenance.get("event"), str)
+            and provenance["event"] in {"schedule", "workflow_dispatch"}, "report is not from main")
     run_id = provenance.get("run_id")
     require(type(run_id) is int and run_id > 0, "invalid provenance run id")
     require(provenance.get("run_url") == f"https://github.com/{repository}/actions/runs/{run_id}",
@@ -126,9 +127,9 @@ def validate_bundle(directory, repository, root=ROOT, run=None):
     except (KeyError, TypeError, ValueError) as error:
         raise ReportError("invalid SSI report date") from error
     if run is not None:
-        require(trusted_run(run, repository) and run_id == run["id"]
-                and provenance["source_sha"] == run["head_sha"]
-                and provenance["event"] == run["event"], "provenance disagrees with Actions run")
+        require(trusted_run(run, repository) and run_id == run.get("id")
+                and provenance["source_sha"] == run.get("head_sha")
+                and provenance["event"] == run.get("event"), "provenance disagrees with Actions run")
     return report, provenance
 
 

@@ -105,7 +105,7 @@ class ReportTests(unittest.TestCase):
     def test_provenance_must_identify_the_downloaded_main_run(self):
         for key, value in [("repository", "someone/solidcore"), ("source_sha", "c" * 40),
                            ("corpus_commit", "d" * 40), ("ref", "refs/pull/1/merge"),
-                           ("event", "pull_request"), ("generated_at", "not a date"),
+                           ("event", "pull_request"), ("event", []), ("generated_at", "not a date"),
                            ("generated_at", []),
                            ("generated_at", "2026-10-28T03:23:00"),
                            ("run_id", 102), ("run_url", "https://example.com")]:
@@ -122,7 +122,7 @@ class ReportTests(unittest.TestCase):
         self.assertFalse(s.trusted_run(None, REPOSITORY))
         for change in [dict(path=".github/workflows/ci.yml"), dict(event="pull_request"),
                        dict(head_branch="other"), dict(conclusion="failure"),
-                       dict(status="in_progress"), dict(repository={"full_name": "fork/solidcore"}),
+                       dict(status="in_progress"), dict(event=[]), dict(repository={"full_name": "fork/solidcore"}),
                        dict(repository=None),
                        dict(head_repository={"full_name": "fork/solidcore"})]:
             with self.subTest(change=change):

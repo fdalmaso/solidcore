@@ -36,7 +36,11 @@ jobs:
       - name: Fetch pinned corpus
         run: scripts/fetch-ssi-corpus.sh
       - name: Build runner
-        run: nice -n 10 cargo build --profile difftest -p difftest --features cpp
+        # Unlike the unit runners, SSI's geometric scorer does substantial work in
+        # difftest itself. Optimise it without changing the workspace's usual profile.
+        run: >-
+          nice -n 10 cargo build --profile difftest -p difftest --features cpp
+          --config 'profile.difftest.package.difftest.opt-level=1'
       - name: Measure all cases and all four engines
         run: nice -n 10 bin/difftest/difftest --ssi-corpus --tol 1e-6 --jobs 4 --report-dir reports/ssi
       - name: Validate report and record measured revisions

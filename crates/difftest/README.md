@@ -750,6 +750,8 @@ errors (unreadable case, report not writable); verdicts never fail the run.
   deterministic.
 * **Published measurements.** `.github/workflows/ssi-corpus.yml` runs all 119 cases
   and all four engines at `1e-6` on `main`, daily at 03:23 UTC and on manual dispatch.
+  The workflow builds the harness at opt-level 1 because SSI's geometric scorer runs
+  inside `difftest`; the normal workspace profile and kernel profile stay unchanged.
   The `ssi-corpus-report` artifact contains the report plus provenance (solidcore SHA,
   SMLib version/commit, corpus commit, measurement date and Actions run URL), retained
   for 90 days. Raw outputs and logs are kept for 14 days. No generated SSI report is
